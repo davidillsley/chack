@@ -47,6 +47,23 @@ public class Driver {
 		}
 	}
 
+	public static class DataSource2 extends HttpServlet {
+
+		@Override
+		protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+				throws ServletException, IOException {
+			resp.setContentType("application/json");
+			resp.addHeader("Cache-Control", "no-store, max-age=0");
+			resp.getWriter().write("{");
+			resp.getWriter().write("\"values\": [");
+			for(int i=0; i<amountOverTime.size();i++){
+				resp.getWriter().write("{\"amount\": "+amountOverTime.get(i)+", \"items_used\":"+itemsOverTime.get(i)+"}");
+				if(i+1 < amountOverTime.size())resp.getWriter().write(",");
+			}
+			resp.getWriter().write("]}");
+		}
+	}
+	
 	public static class DataUpload extends HttpServlet {
 
 		@Override
@@ -143,6 +160,7 @@ public class Driver {
 
 		context.addServlet(new ServletHolder(new PaypalButton()), "/button");
 		context.addServlet(new ServletHolder(new DataSource()), "/data");
+		context.addServlet(new ServletHolder(new DataSource2()), "/data-ext");
 		context.addServlet(new ServletHolder(new DataUpload()), "/data-update");
 		context.addServlet(new ServletHolder(new PaypalCallback()),
 				"/paypalCallback");
