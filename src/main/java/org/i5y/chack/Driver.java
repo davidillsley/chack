@@ -3,6 +3,9 @@ package org.i5y.chack;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletException;
@@ -27,6 +30,8 @@ public class Driver {
 
 	public static AtomicInteger amount = new AtomicInteger(0);
 	public static AtomicInteger itemsUsed = new AtomicInteger(0);
+	public static CopyOnWriteArrayList<Integer> amountOverTime = new CopyOnWriteArrayList<Integer>();
+	public static CopyOnWriteArrayList<Integer> itemsOverTime = new CopyOnWriteArrayList<Integer>();
 
 	public static class DataSource extends HttpServlet {
 
@@ -48,7 +53,7 @@ public class Driver {
 		protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 				throws ServletException, IOException {
 			System.out.println("got a post!");
-			int increment = Integer.parseInt(req.getParameter("count"));
+			int increment = Integer.parseInt(req.getParameter("quantity"));
 			if (itemsUsed.addAndGet(increment) > 2) {
 				TwitterFactory factory = new TwitterFactory();
 				Twitter twitter = factory.getInstance();
@@ -114,6 +119,17 @@ public class Driver {
 
 	public static void main(String[] args) throws Exception {
 
+		Timer t = new Timer();
+		t.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				amountOverTime.add(amount.get());
+				itemsOverTime.add(itemsUsed.get());
+				System.out.println(amountOverTime+" "+itemsOverTime);
+			}
+
+		}, 0, 60 * 1000);
 		Server server = new Server(9777);
 
 		ServletContextHandler context = new ServletContextHandler(
