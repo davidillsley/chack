@@ -124,9 +124,13 @@ public class Driver {
 
 			@Override
 			public void run() {
+				if (amountOverTime.size() >= 10) {
+					amountOverTime.remove(0);
+					itemsOverTime.remove(0);
+				}
 				amountOverTime.add(amount.get());
 				itemsOverTime.add(itemsUsed.get());
-				System.out.println(amountOverTime+" "+itemsOverTime);
+				System.out.println(amountOverTime + " " + itemsOverTime);
 			}
 
 		}, 0, 60 * 1000);
