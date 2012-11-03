@@ -99,7 +99,7 @@ public class Driver {
 			String line = br.readLine();
 			String file = "";
 			while (line != null) {
-				file += line;
+				file += line+"\n";
 				line = br.readLine();
 			}
 			FILE = file;
@@ -110,7 +110,13 @@ public class Driver {
 				throws ServletException, IOException {
 			resp.setContentType("text/html");
 			resp.addHeader("Cache-Control", "no-store, max-age=0");
-			resp.getWriter().write(FILE);
+			
+			String amount = req.getParameter("amount");
+			if(amount == null || amount == ""){
+				amount = "10.0";
+			}
+			String replaced = FILE.replaceAll("inputamount", amount);
+			resp.getWriter().write(replaced);
 		}
 	}
 
