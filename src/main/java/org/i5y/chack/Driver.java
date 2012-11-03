@@ -33,7 +33,6 @@ public class Driver {
 				throws ServletException, IOException {
 			
 			String authToken = "6FoqrNh1cODczB9r9xBrV2iD7t8Jn25saE0b2oCkcjvcd7b0fmfU_AyWPqK";
-			
 			String tx = req.getParameter("tx");
 			
 			resp.setContentType("application/json");
@@ -51,6 +50,8 @@ public class Driver {
 
 		context.addServlet(new ServletHolder(new PaypalButton()),
 				"/.well-known/browserid");
+		context.addServlet(new ServletHolder(new PaypalCallback()),
+				"/paypalCallback");
 
 		ServletHolder defaultServletHolder = new ServletHolder(
 				new DefaultServlet());
