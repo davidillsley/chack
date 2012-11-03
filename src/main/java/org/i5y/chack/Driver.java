@@ -32,11 +32,9 @@ public class Driver {
 		protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 				throws ServletException, IOException {
 			
-			String authToken = "6FoqrNh1cODczB9r9xBrV2iD7t8Jn25saE0b2oCkcjvcd7b0fmfU_AyWPqK";
+			String authToken = "ZjmIRL-WoHTIP6XvX2Ika6RUXAL3vkCjMCVYVPhI7VYaWaaF2P7CvEAB2WC";
 			String tx = req.getParameter("tx");
-			
-			resp.setContentType("application/json");
-			resp.addHeader("Cache-Control", "no-store, max-age=0");
+			String amt = req.getParameter("amt");
 			resp.getWriter().write("");
 		}
 	}
