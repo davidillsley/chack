@@ -107,7 +107,8 @@ public class Driver {
 			String tx = req.getParameter("tx");
 			String amt = req.getParameter("amt");
 			amount.addAndGet((int) (Double.parseDouble(amt) * 100));
-			resp.getWriter().write("Thank you for your payment. Your transaction has been completed, and a receipt for your purchase has been emailed to you. You may log into your account at www.sandbox.paypal.com/us to view details of this transaction.");
+			resp.setHeader("Location", "http://107.21.242.232/charity/?donated=true&value="+amt);
+			resp.setStatus(302);
 		}
 	}
 
