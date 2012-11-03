@@ -1,6 +1,8 @@
 package org.i5y.chack;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletException;
@@ -19,6 +21,8 @@ public class Driver {
 	
 	public static AtomicInteger amount = new AtomicInteger(0);
 
+	public static AtomicInteger itemsUsed = new AtomicInteger(0);
+
 	public static class DataSource extends HttpServlet {
 
 		@Override
@@ -27,21 +31,44 @@ public class Driver {
 			resp.setContentType("application/json");
 			resp.addHeader("Cache-Control", "no-store, max-age=0");
 			resp.getWriter().write("{");
-			resp.getWriter().write("\"amount\":"+amount.get());
-
+			resp.getWriter().write("\"amount\":"+amount.get()+",");
+			resp.getWriter().write("\"items_used\":"+itemsUsed.get());
 			resp.getWriter().write("}");
 		}
 	}
 
+	public static class DataUpload extends HttpServlet {
+
+		@Override
+		protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+				throws ServletException, IOException {
+			int increment = Integer.parseInt(req.getParameter("count"));
+			itemsUsed.addAndGet(increment);
+		}
+	}
 	
 	public static class PaypalButton extends HttpServlet {
 
+		 final String FILE; 
+		
+		public PaypalButton() throws Exception{
+			BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream("button.html")));
+			
+			String line = br.readLine();
+			String file = "";
+			while(line != null){
+				file+=line;
+				line = br.readLine();
+			}
+			FILE = file;
+		}
+		
 		@Override
 		protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 				throws ServletException, IOException {
-			resp.setContentType("application/json");
+			resp.setContentType("text/html");
 			resp.addHeader("Cache-Control", "no-store, max-age=0");
-			resp.getWriter().write("");
+			resp.getWriter().write(FILE);
 		}
 	}
 
@@ -67,9 +94,11 @@ public class Driver {
 		context.setContextPath("/");
 
 		context.addServlet(new ServletHolder(new PaypalButton()),
-				"/.well-known/browserid");
+				"/button");
 		context.addServlet(new ServletHolder(new DataSource()),
 				"/data");
+		context.addServlet(new ServletHolder(new DataUpload()),
+				"/data-update");
 		context.addServlet(new ServletHolder(new PaypalCallback()),
 				"/paypalCallback");
 
