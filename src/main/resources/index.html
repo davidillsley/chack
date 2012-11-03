@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="https://browserid.org/authentication_api.js"></script>
+<script type="text/javascript">
+	console.log("beginning....");
+	$(document).ready(function() {
+		console.log("ready called");
+		navigator.id.beginAuthentication(function(email) {
+			console.log("beginning authentication" + email);
+			$("#hiddenemail").val(email);
+			if(email != ''){
+			  $("#signin").show();
+			}
+		})
+		$("form").submit(function(e) {
+            e.preventDefault();
+			console.log("login clicked...");
+			$.ajax({
+				url : "/signin",
+				type : "post",
+				dataType : "json",
+				data : {
+					"email" : $("#hiddenemail").val(),
+					"password" : $("#password").val()
+				},
+				success : function(data, textStatus, jqXHR) {
+					console.log(JSON.stringify(data));
+					console.log(data["success"]);
+					if(data.success == true){
+						navigator.id.completeAuthentication();
+					}else{
+						$("#error").text("login failed... feel free to try again");
+					}
+				},
+				error : function(jqXHR, textStatus, errorThrown) {
+					console.log(textStatus);
+				}
+			});
+		});
+		$("#cancel").click(function(e) {
+		    navigator.id.raiseAuthenticationFailure("user canceled authentication");
+		});
+	})
+</script>
+<style type="text/css">
+#signin{
+display: none;
+}</style>
+</head>
+<body>
+	<div id="signin" style="display: none">
+	Please sign in...
+	<form>
+		<input type="hidden" name="email" id="hiddenemail"> <input
+			type="password" name="password" id="password"> <input type="submit"
+			id="login" value="login">
+			<input type="button"
+			id="cancel" value="cancel">
+	</form>
+	</div>
+	
+	<div id="error"></div>
+</body>
+</html>
