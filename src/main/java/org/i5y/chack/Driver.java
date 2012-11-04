@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -48,6 +49,7 @@ public class Driver {
 	public static CopyOnWriteArrayList<String> recentDonations = new CopyOnWriteArrayList<String>();
 	public static CopyOnWriteArrayList<String> recentSms = new CopyOnWriteArrayList<String>();
 	public static AtomicReference<String> recentUpdateDetails = new AtomicReference<String>("");
+	public static ConcurrentHashMap<String, Integer> itemsUsedMap = new ConcurrentHashMap<String, Integer>();
 
 	public static class DataSource extends HttpServlet {
 
@@ -137,10 +139,19 @@ public class Driver {
 			if(updateDescription == null) updateDescription = "";
 			recentUpdateDetails.set(updateDescription);
 			
-			int increment = Integer.parseInt(req.getParameter("quantity"));
-			itemsUsed.addAndGet(increment);
+			int quantity = Integer.parseInt(req.getParameter("quantity"));
 
-			System.out.println("Quantity: "+increment);
+			System.out.println("Quantity: "+quantity);
+			
+			String deviceId = req.getParameter("deviceId");
+			if(deviceId == null) deviceId = "DeviceOne";
+
+			itemsUsedMap.put(deviceId, quantity);
+			int count = 0;
+			for(Integer i: itemsUsedMap.values()){
+				count +=i;
+			}
+			itemsUsed.set(count);
 			
 			// Need to decide if the current status is worth a warning...
 			// If rate of growth in need is more than rate of growth in
