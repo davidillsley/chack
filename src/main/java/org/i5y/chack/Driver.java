@@ -198,7 +198,7 @@ public class Driver {
 			amount.addAndGet((int) (Double.parseDouble(amt) * 100));
 			resp.setHeader("Location",
 					"http://107.21.242.232/charity/?donated=true&value=" + amt);
-			recentDonations.add("A generous donations of "+amt+" by Anonymous at "+new Date());
+			recentDonations.add("\"A generous donations of "+amt+" by Anonymous at "+new Date()+"\"");
 			resp.setStatus(302);
 		}
 	}
