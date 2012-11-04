@@ -271,7 +271,7 @@ public class Driver {
 			String amt = req.getParameter("amt");
 			amount.addAndGet((int) (Double.parseDouble(amt) * 100));
 			resp.setHeader("Location",
-					"http://107.21.242.232/charity/?donated=true&value=" + amt);
+					"http://necto.me/donate.html?donated=true&value=" + amt+"&people="+((int)(Double.parseDouble(amt)/0.18)));
 			recentDonations.add("\"A generous donations of "+amt+" by Anonymous at "+new Date()+"\"");
 			resp.setStatus(302);
 		}
