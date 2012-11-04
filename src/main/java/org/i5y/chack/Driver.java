@@ -7,6 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -27,6 +28,16 @@ import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 
 public class Driver {
+
+	/**
+	 * 
+	 * THIS IS COMPLETELY MADE UP DATA item cost per item (£) number of items
+	 * already funded number of items needed in next month funding gap (£)
+	 * hostel beds 0.18 1200 4000 720 peanut paste 0.2 10000 23000 4600 tetanus
+	 * vaccine 0.12 23000 50000 6000 measles vaccine 0.15 23000 50000 7500
+	 * school kits 150 150 320 48000 rhino protection unit 3500 5 2 7000
+	 * 
+	 */
 
 	public static AtomicInteger amount = new AtomicInteger(0);
 	public static AtomicInteger itemsUsed = new AtomicInteger(0);
@@ -56,34 +67,65 @@ public class Driver {
 			resp.addHeader("Cache-Control", "no-store, max-age=0");
 			resp.getWriter().write("{");
 			resp.getWriter().write("\"values\": [");
-			for(int i=0; i<amountOverTime.size();i++){
-				resp.getWriter().write("{\"amount\": "+amountOverTime.get(i)+", \"items_used\":"+itemsOverTime.get(i)+"}");
-				if(i+1 < amountOverTime.size())resp.getWriter().write(",");
+			for (int i = 0; i < amountOverTime.size(); i++) {
+				resp.getWriter().write(
+						"{\"amount\": " + amountOverTime.get(i)
+								+ ", \"items_used\":" + itemsOverTime.get(i)
+								+ "}");
+				if (i + 1 < amountOverTime.size())
+					resp.getWriter().write(",");
 			}
 			resp.getWriter().write("]}");
 		}
 	}
-	
+
 	public static class DataUpload extends HttpServlet {
+
+		private final AtomicLong lastTweetAt = new AtomicLong();
 
 		@Override
 		protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 				throws ServletException, IOException {
 			System.out.println("got a post!");
 			int increment = Integer.parseInt(req.getParameter("quantity"));
-			if (itemsUsed.addAndGet(increment) > 2) {
+
+			// Need to decide if the current status is worth a warning...
+			// If rate of growth in need is more than rate of growth in
+			// payments...
+
+			double ratio = 1 / 0.18;
+			double growthItems = (itemsOverTime.get(itemsOverTime.size() - 1) * ratio)
+					- (itemsOverTime.get(0) * ratio);
+			double growthAmount = amountOverTime.get(amountOverTime.size() - 1)
+					- amountOverTime.get(0);
+
+			// If it's at least 30 seconds since we tweeted.... and the growth
+			// of need is much faster than the amount
+			// of cash we have...
+			if (lastTweetAt.get() < (System.currentTimeMillis() - (1000 * 30))
+					&& growthItems > growthAmount) {
+
+				String message = "Thanks for your help so far for XX. The funds for XX are now low - so we're reaching out to see if you could make a top up. For every £X we'll be able to continue our world changing work. ";
+				if (growthItems > (growthAmount * 3)) {
+					message = "We wanted to let you know the charity project you're funding needs your help. They've reached XX people and now need to top up funding to reach XX more. Please help if you can.";
+				} else if (growthItems > (growthAmount * 2)) {
+					message = "Since we last contacted you we've helped XX people with the help of people like you. That's amazing, but there's still more to do and funds are running low. If you can, please help by making a donation top up or spreading the word.";
+				}
+
 				TwitterFactory factory = new TwitterFactory();
 				Twitter twitter = factory.getInstance();
 				twitter.setOAuthConsumer(consumerKey, consumerSecret);
 				twitter.setOAuthAccessToken(new AccessToken(accessToken,
 						accessTokenSecret));
 				try {
-					Status status = twitter.updateStatus("We hit a limit");
+					Status status = twitter.updateStatus(message);
 				} catch (TwitterException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+
 			}
+
 		}
 	}
 
@@ -99,7 +141,7 @@ public class Driver {
 			String line = br.readLine();
 			String file = "";
 			while (line != null) {
-				file += line+"\n";
+				file += line + "\n";
 				line = br.readLine();
 			}
 			FILE = file;
@@ -110,9 +152,9 @@ public class Driver {
 				throws ServletException, IOException {
 			resp.setContentType("text/html");
 			resp.addHeader("Cache-Control", "no-store, max-age=0");
-			
+
 			String amount = req.getParameter("amount");
-			if(amount == null || amount == ""){
+			if (amount == null || amount == "") {
 				amount = "10.0";
 			}
 			String replaced = FILE.replaceAll("inputamount", amount);
@@ -130,7 +172,8 @@ public class Driver {
 			String tx = req.getParameter("tx");
 			String amt = req.getParameter("amt");
 			amount.addAndGet((int) (Double.parseDouble(amt) * 100));
-			resp.setHeader("Location", "http://107.21.242.232/charity/?donated=true&value="+amt);
+			resp.setHeader("Location",
+					"http://107.21.242.232/charity/?donated=true&value=" + amt);
 			resp.setStatus(302);
 		}
 	}
