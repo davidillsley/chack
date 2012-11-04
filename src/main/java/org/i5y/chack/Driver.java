@@ -106,11 +106,11 @@ public class Driver {
 			if (lastTweetAt.get() < (System.currentTimeMillis() - (1000 * 30))
 					&& growthItems > growthAmount) {
 
-				String message = "Thanks for your help so far for XX. The funds for XX are now low - so we're reaching out to see if you could make a top up. For every poundX we'll be able to continue our world changing work. ";
+				String message = "Thanks for your help so far for XX. The funds for XX are now low - so we're reaching out to see if you could make a top up.";
 				if (growthItems > (growthAmount * 3)) {
-					message = "We wanted to let you know the charity project you're funding needs your help. They've reached XX people and now need to top up funding to reach XX more. Please help if you can.";
+					message =   "We wanted to let you know the charity project you're funding needs your help. They now need to top up funding to reach XX more.";
 				} else if (growthItems > (growthAmount * 2)) {
-					message = "Since we last contacted you we've helped XX people with the help of people like you. That's amazing, but there's still more to do and funds are running low. If you can, please help by making a donation top up or spreading the word.";
+					message =   "Since we last contacted you we've helped XX people with your help. That's amazing, but there's still more to do and funds are running low.";
 				}
 
 				TwitterFactory factory = new TwitterFactory();
