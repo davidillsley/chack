@@ -46,6 +46,7 @@ public class Driver {
 	public static CopyOnWriteArrayList<Integer> amountOverTime = new CopyOnWriteArrayList<Integer>();
 	public static CopyOnWriteArrayList<Integer> itemsOverTime = new CopyOnWriteArrayList<Integer>();
 	public static CopyOnWriteArrayList<String> recentDonations = new CopyOnWriteArrayList<String>();
+	public static CopyOnWriteArrayList<String> recentSms = new CopyOnWriteArrayList<String>();
 	public static AtomicReference<String> recentUpdateDetails = new AtomicReference<String>("");
 
 	public static class DataSource extends HttpServlet {
@@ -86,6 +87,25 @@ public class Driver {
 		}
 	}
 
+	public static class RecentSms extends HttpServlet {
+
+		@Override
+		protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+				throws ServletException, IOException {
+			resp.setContentType("application/json");
+			resp.addHeader("Cache-Control", "no-store, max-age=0");
+			resp.getWriter().write("{");
+			resp.getWriter().write("\"values\": [");
+			
+			for (int i = 0; i < recentSms.size(); i++) {
+				resp.getWriter().write("\""+recentSms.get(i)+"\"");
+				if (i + 1 < recentSms.size())
+					resp.getWriter().write(",");
+			}
+			resp.getWriter().write("]}");
+		}
+	}
+	
 	public static class RecentDonations extends HttpServlet {
 
 		@Override
@@ -97,7 +117,7 @@ public class Driver {
 			resp.getWriter().write("\"values\": [");
 			
 			for (int i = 0; i < recentDonations.size(); i++) {
-				resp.getWriter().write(recentDonations.get(i));
+				resp.getWriter().write("\""+recentDonations.get(i)+"\"");
 				if (i + 1 < recentDonations.size())
 					resp.getWriter().write(",");
 			}
@@ -174,6 +194,11 @@ public class Driver {
 			if(body.length()>120) body = body.substring(0,120);
 			if(sender.equals("+447773644496")){
 				body = "David: "+body;
+			}
+			
+			recentSms.add(body);
+			if(recentSms.size() > 10){
+				recentSms.remove(0);
 			}
 			TwitterFactory factory = new TwitterFactory();
 			Twitter twitter = factory.getInstance();
@@ -272,6 +297,7 @@ public class Driver {
 		context.addServlet(new ServletHolder(new DataSource()), "/data");
 		context.addServlet(new ServletHolder(new DataSource2()), "/data-ext");
 		context.addServlet(new ServletHolder(new RecentDonations()), "/recent-donations");
+		context.addServlet(new ServletHolder(new RecentSms()), "/recent-sms");
 		context.addServlet(new ServletHolder(new DataUpload()), "/data-update");
 		context.addServlet(new ServletHolder(new TwilioSms()), "/twilio");
 		context.addServlet(new ServletHolder(new PaypalCallback()),
