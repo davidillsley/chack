@@ -9,6 +9,7 @@ import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -45,6 +46,7 @@ public class Driver {
 	public static CopyOnWriteArrayList<Integer> amountOverTime = new CopyOnWriteArrayList<Integer>();
 	public static CopyOnWriteArrayList<Integer> itemsOverTime = new CopyOnWriteArrayList<Integer>();
 	public static CopyOnWriteArrayList<String> recentDonations = new CopyOnWriteArrayList<String>();
+	public static AtomicReference<String> recentUpdateDetails = new AtomicReference<String>("");
 
 	public static class DataSource extends HttpServlet {
 
@@ -56,7 +58,8 @@ public class Driver {
 			resp.getWriter().write("{");
 			resp.getWriter().write("\"amount\":" + amount.get() + ",");
 			resp.getWriter().write("\"items_used\":" + itemsUsed.get()+",");
-			resp.getWriter().write("\"item_price\":" +  "0.18");
+			resp.getWriter().write("\"item_price\":" +  "0.18"+",");			
+			resp.getWriter().write("\"recent_update_description\":" +  recentUpdateDetails.get());
 			resp.getWriter().write("}");
 		}
 	}
@@ -110,6 +113,10 @@ public class Driver {
 		protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 				throws ServletException, IOException {
 			System.out.println("got a post!");
+			String updateDescription = req.getParameter("description");
+			if(updateDescription == null) updateDescription = "";
+			recentUpdateDetails.set(updateDescription);
+			
 			int increment = Integer.parseInt(req.getParameter("quantity"));
 			itemsUsed.addAndGet(increment);
 
