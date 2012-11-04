@@ -74,6 +74,7 @@ public class Driver {
 		protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 				throws ServletException, IOException {
 			resp.setContentType("application/json");
+			resp.addHeader("Access-Control-Allow-Origin", "*");
 			resp.addHeader("Cache-Control", "no-store, max-age=0");
 			resp.getWriter().write("{");
 			resp.getWriter().write("\"item_price\":" +  "0.18"+",");
@@ -96,6 +97,7 @@ public class Driver {
 		protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 				throws ServletException, IOException {
 			resp.setContentType("application/json");
+			resp.addHeader("Access-Control-Allow-Origin", "*");
 			resp.addHeader("Cache-Control", "no-store, max-age=0");
 			resp.getWriter().write("{");
 			resp.getWriter().write("\"values\": [");
@@ -115,6 +117,7 @@ public class Driver {
 		protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 				throws ServletException, IOException {
 			resp.setContentType("application/json");
+			resp.addHeader("Access-Control-Allow-Origin", "*");
 			resp.addHeader("Cache-Control", "no-store, max-age=0");
 			resp.getWriter().write("{");
 			resp.getWriter().write("\"values\": [");
