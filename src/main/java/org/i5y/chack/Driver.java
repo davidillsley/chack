@@ -88,6 +88,7 @@ public class Driver {
 				throws ServletException, IOException {
 			System.out.println("got a post!");
 			int increment = Integer.parseInt(req.getParameter("quantity"));
+			itemsUsed.addAndGet(increment);
 
 			// Need to decide if the current status is worth a warning...
 			// If rate of growth in need is more than rate of growth in
