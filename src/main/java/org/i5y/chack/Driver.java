@@ -3,6 +3,7 @@ package org.i5y.chack;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -43,6 +44,7 @@ public class Driver {
 	public static AtomicInteger itemsUsed = new AtomicInteger(0);
 	public static CopyOnWriteArrayList<Integer> amountOverTime = new CopyOnWriteArrayList<Integer>();
 	public static CopyOnWriteArrayList<Integer> itemsOverTime = new CopyOnWriteArrayList<Integer>();
+	public static CopyOnWriteArrayList<String> recentDonations = new CopyOnWriteArrayList<String>();
 
 	public static class DataSource extends HttpServlet {
 
@@ -53,7 +55,8 @@ public class Driver {
 			resp.addHeader("Cache-Control", "no-store, max-age=0");
 			resp.getWriter().write("{");
 			resp.getWriter().write("\"amount\":" + amount.get() + ",");
-			resp.getWriter().write("\"items_used\":" + itemsUsed.get());
+			resp.getWriter().write("\"items_used\":" + itemsUsed.get()+",");
+			resp.getWriter().write("\"item_price\":" +  "0.18");
 			resp.getWriter().write("}");
 		}
 	}
@@ -66,6 +69,7 @@ public class Driver {
 			resp.setContentType("application/json");
 			resp.addHeader("Cache-Control", "no-store, max-age=0");
 			resp.getWriter().write("{");
+			resp.getWriter().write("\"item_price\":" +  "0.18");
 			resp.getWriter().write("\"values\": [");
 			for (int i = 0; i < amountOverTime.size(); i++) {
 				resp.getWriter().write(
@@ -79,6 +83,25 @@ public class Driver {
 		}
 	}
 
+	public static class RecentDonations extends HttpServlet {
+
+		@Override
+		protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+				throws ServletException, IOException {
+			resp.setContentType("application/json");
+			resp.addHeader("Cache-Control", "no-store, max-age=0");
+			resp.getWriter().write("{");
+			resp.getWriter().write("\"values\": [");
+			
+			for (int i = 0; i < recentDonations.size(); i++) {
+				resp.getWriter().write(recentDonations.get(i));
+				if (i + 1 < recentDonations.size())
+					resp.getWriter().write(",");
+			}
+			resp.getWriter().write("]}");
+		}
+	}
+	
 	public static class DataUpload extends HttpServlet {
 
 		private final AtomicLong lastTweetAt = new AtomicLong();
@@ -175,6 +198,7 @@ public class Driver {
 			amount.addAndGet((int) (Double.parseDouble(amt) * 100));
 			resp.setHeader("Location",
 					"http://107.21.242.232/charity/?donated=true&value=" + amt);
+			recentDonations.add("A generous donations of "+amt+" by Anonymous at "+new Date());
 			resp.setStatus(302);
 		}
 	}
@@ -211,6 +235,7 @@ public class Driver {
 		context.addServlet(new ServletHolder(new PaypalButton()), "/button");
 		context.addServlet(new ServletHolder(new DataSource()), "/data");
 		context.addServlet(new ServletHolder(new DataSource2()), "/data-ext");
+		context.addServlet(new ServletHolder(new RecentDonations()), "/recent-donations");
 		context.addServlet(new ServletHolder(new DataUpload()), "/data-update");
 		context.addServlet(new ServletHolder(new PaypalCallback()),
 				"/paypalCallback");
