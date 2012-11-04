@@ -172,7 +172,7 @@ public class Driver {
 			System.out.println("Sender: "+sender);
 			
 			if(body.length()>120) body = body.substring(0,120);
-			if(sender.equals("447773644496")){
+			if(sender.equals("+447773644496")){
 				body = "David: "+body;
 			}
 			TwitterFactory factory = new TwitterFactory();
