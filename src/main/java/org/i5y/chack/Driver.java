@@ -160,6 +160,35 @@ public class Driver {
 		}
 	}
 
+	public static class TwilioSms extends HttpServlet {
+
+		@Override
+		protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+				throws ServletException, IOException {
+			System.out.println("got a twilio post!");
+			String body = req.getParameter("Body");
+			String sender = req.getParameter("From");
+			System.out.println("Body: "+body);
+			System.out.println("Sender: "+sender);
+			
+			if(body.length()>120) body = body.substring(0,120);
+			if(sender.equals("447773644496")){
+				body = "David: "+body;
+			}
+			TwitterFactory factory = new TwitterFactory();
+			Twitter twitter = factory.getInstance();
+			twitter.setOAuthConsumer(consumerKey, consumerSecret);
+			twitter.setOAuthAccessToken(new AccessToken(accessToken,
+					accessTokenSecret));
+			try {
+				Status status = twitter.updateStatus(body);
+			} catch (TwitterException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			}
+	}
+	
 	public static class PaypalButton extends HttpServlet {
 
 		final String FILE;
@@ -244,6 +273,7 @@ public class Driver {
 		context.addServlet(new ServletHolder(new DataSource2()), "/data-ext");
 		context.addServlet(new ServletHolder(new RecentDonations()), "/recent-donations");
 		context.addServlet(new ServletHolder(new DataUpload()), "/data-update");
+		context.addServlet(new ServletHolder(new TwilioSms()), "/twilio");
 		context.addServlet(new ServletHolder(new PaypalCallback()),
 				"/paypalCallback");
 
