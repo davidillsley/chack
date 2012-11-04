@@ -31,8 +31,8 @@ public class Driver {
 
 	/**
 	 * 
-	 * THIS IS COMPLETELY MADE UP DATA item cost per item (£) number of items
-	 * already funded number of items needed in next month funding gap (£)
+	 * THIS IS COMPLETELY MADE UP DATA item cost per item  number of items
+	 * already funded number of items needed in next month funding gap 
 	 * hostel beds 0.18 1200 4000 720 peanut paste 0.2 10000 23000 4600 tetanus
 	 * vaccine 0.12 23000 50000 6000 measles vaccine 0.15 23000 50000 7500
 	 * school kits 150 150 320 48000 rhino protection unit 3500 5 2 7000
@@ -105,7 +105,7 @@ public class Driver {
 			if (lastTweetAt.get() < (System.currentTimeMillis() - (1000 * 30))
 					&& growthItems > growthAmount) {
 
-				String message = "Thanks for your help so far for XX. The funds for XX are now low - so we're reaching out to see if you could make a top up. For every £X we'll be able to continue our world changing work. ";
+				String message = "Thanks for your help so far for XX. The funds for XX are now low - so we're reaching out to see if you could make a top up. For every poundX we'll be able to continue our world changing work. ";
 				if (growthItems > (growthAmount * 3)) {
 					message = "We wanted to let you know the charity project you're funding needs your help. They've reached XX people and now need to top up funding to reach XX more. Please help if you can.";
 				} else if (growthItems > (growthAmount * 2)) {
