@@ -59,7 +59,7 @@ public class Driver {
 			resp.setContentType("application/json");
 			resp.addHeader("Cache-Control", "no-store, max-age=0");
 			resp.getWriter().write("{");
-			resp.getWriter().write("\"amount\":" + amount.get() + ",");
+			resp.getWriter().write("\"amount\":" + (amount.get()/100) + ",");
 			resp.getWriter().write("\"items_used\":" + itemsUsed.get()+",");
 			resp.getWriter().write("\"item_price\":" +  "0.18"+",");			
 			resp.getWriter().write("\"recent_update_description\":" +  "\""+recentUpdateDetails.get()+"\"");
